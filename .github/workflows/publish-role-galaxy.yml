@@ -1,4 +1,5 @@
 ---
+
 name: Publish role to Ansible Galaxy
 
 on:

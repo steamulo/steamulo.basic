@@ -11,8 +11,8 @@ lint: |
   flake8
 platforms:
   - name: instance
-    image: ${MOLECULE_DISTRO:-ubuntu2004}
-    dockerfile: ../docker/Dockerfile-${MOLECULE_DISTRO:-ubuntu2004}
+    image: ${MOLECULE_DISTRO:-ubuntu2204}
+    dockerfile: ../docker/Dockerfile-${MOLECULE_DISTRO:-ubuntu2204}
     pre_build_image: false
     privileged: true
     volumes:
