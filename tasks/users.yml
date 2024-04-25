@@ -61,7 +61,11 @@
 - name: Set chattr -R -a on users' files and directories
   command: "chattr -R -a /home/{{ item }}"
   loop: "{{ basic_to_remove_users }}"
-  when: basic_to_remove_users is defined and basic_to_remove_users | length > 0
+  when:
+    - basic_to_remove_users is defined
+    - basic_to_remove_users | length > 0
+    - item is defined
+    - lookup('fileglob', '/home/' + item, wantlist=True) | length > 0
 
 - name: Remove old users
   user:
