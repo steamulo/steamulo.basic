@@ -51,3 +51,7 @@
 
 - include: journald.yml
   tags: basic_journald
+
+- include: auditd.yml
+  when: basic_enable_command_audit
+  tags: basic_auditd

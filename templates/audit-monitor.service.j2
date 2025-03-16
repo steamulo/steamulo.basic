@@ -1,0 +1,7 @@
+[Unit]
+Description=Audit de sécurité système
+After=auditd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/audit_monitor.sh

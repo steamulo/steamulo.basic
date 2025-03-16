@@ -1,0 +1,93 @@
+---
+
+- name: Configure security auditing rules
+  copy:
+    dest: /etc/audit/rules.d/50-security-events.rules
+    content: |
+      # Surveillance des fichiers de configuration SSH
+      -w /etc/ssh/sshd_config -p wa -k ssh_config
+      -w /root/.ssh/ -p wa -k ssh_key
+      -w /home/*/.ssh/ -p wa -k ssh_key
+
+      # Surveillance des fichiers système critiques
+      -w /etc/passwd -p wa -k system_users
+      -w /etc/shadow -p wa -k system_users
+      -w /etc/group -p wa -k system_users
+      -w /etc/sudoers -p wa -k sudo_config
+      -w /etc/sudoers.d/ -p wa -k sudo_config
+
+      # Surveillance du système de démarrage
+      -w /etc/systemd/ -p wa -k systemd_config
+      -w /lib/systemd/ -p wa -k systemd_lib
+      -w /usr/lib/systemd/ -p wa -k systemd_lib
+      -w /etc/rc.local -p wa -k boot_scripts
+      -w /etc/init.d/ -p wa -k boot_scripts
+
+      # Surveillance des installations de logiciels
+      {% if ansible_os_family == 'Debian' %}
+      -w /usr/bin/apt -p x -k software_mgmt
+      -w /usr/bin/apt-get -p x -k software_mgmt
+      -w /usr/bin/dpkg -p x -k software_mgmt
+      {% elif ansible_os_family == 'RedHat' %}
+      -w /usr/bin/yum -p x -k software_mgmt
+      -w /usr/bin/dnf -p x -k software_mgmt
+      {% endif %}
+
+      # Surveillance des modifications de configuration réseau
+      -w /etc/hosts -p wa -k network_config
+      {% if ansible_os_family == 'RedHat' %}
+      -w /etc/sysconfig/network -p wa -k network_config
+      {% endif %}
+      {% if ansible_distribution in ['Ubuntu', 'Debian'] %}
+      -w /etc/network/ -p wa -k network_config
+      -w /etc/netplan/ -p wa -k network_config
+      {% endif %}
+
+      # Surveillance des modifications du pare-feu
+      -w /sbin/iptables -p x -k firewall
+      -w /sbin/ip6tables -p x -k firewall
+      {% if ansible_os_family == 'Debian' %}
+      -w /usr/sbin/ufw -p x -k firewall
+      -w /etc/ufw/ -p wa -k firewall
+      {% endif %}
+
+      # Surveillance des accès aux données sensibles
+      -w /var/log/ -p wa -k sensitive_logs
+      -w /etc/crontab -p wa -k cron_config
+      -w /etc/cron.d/ -p wa -k cron_config
+      -w /var/spool/cron/ -p wa -k cron_config
+
+      # Surveillance des commandes privilégiées
+      -a always,exit -F path=/usr/bin/sudo -F perm=x -k privileged_command
+      -a always,exit -F path=/usr/bin/su -F perm=x -k privileged_command
+      -a always,exit -F path=/usr/bin/mount -F perm=x -k mount_operations
+      -a always,exit -F path=/usr/bin/umount -F perm=x -k mount_operations
+
+      # Surveillance des échecs d'authentification
+      {% if ansible_os_family == 'Debian' %}
+      -w /var/log/auth.log -p r -k auth_failures
+      {% elif ansible_os_family == 'RedHat' %}
+      -w /var/log/secure -p r -k auth_failures
+      {% endif %}
+    mode: '0640'
+  notify: Restart auditd
+
+- name: Create audit monitoring shell script
+  template:
+    src: templates/audit_monitor.sh.j2
+    dest: /usr/local/bin/audit_monitor.sh
+    mode: '0755'
+
+- name: Configure audit-monitor systemd service
+  template:
+    src: templates/audit-monitor.service.j2
+    dest: /etc/systemd/system/audit-monitor.service
+    mode: '0644'
+  notify: Reload systemd daemon
+
+- name: Configure audit-monitor systemd timer
+  template:
+    src: templates/audit-monitor.timer.j2
+    dest: /etc/systemd/system/audit-monitor.timer
+    mode: '0644'
+  notify: Start audit-monitor timer

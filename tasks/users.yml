@@ -68,15 +68,15 @@
     name: root
     password: "!"
 
-#- name: Set chattr -R -a on users' files and directories  TODO fix me
-#  command: "chattr -R -a /home/{{ item }}"
-#  loop: "{{ basic_to_remove_users }}"
-#  when:
-#    - basic_to_remove_users is defined
-#    - basic_to_remove_users | length > 0
-#    - ansible.builtin.stat(path="/home/{{ item }}").stat.exists
-#  vars:
-#    ansible_become: yes
+# - name: Set chattr -R -a on users' files and directories  TODO fix me
+#   command: "chattr -R -a /home/{{ item }}"
+#   loop: "{{ basic_to_remove_users }}"
+#   when:
+#     - basic_to_remove_users is defined
+#     - basic_to_remove_users | length > 0
+#     - ansible.builtin.stat(path="/home/{{ item }}").stat.exists
+#   vars:
+#     ansible_become: yes
 
 - name: Remove old users
   user:

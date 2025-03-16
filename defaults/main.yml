@@ -73,3 +73,6 @@ basic_sysctl_config: []
 
 # journald
 basic_journald: []
+
+# auditd configuration
+basic_enable_command_audit: false

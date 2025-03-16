@@ -55,6 +55,9 @@ basic_common_packages:
   - pv
   - iperf3
   - smartmontools
+  - auditd
+  - audispd-plugins
+  - mailx
 
 ubuntu_22_packages:
   - netcat

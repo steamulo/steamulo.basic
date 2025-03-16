@@ -1,0 +1,7 @@
+ansible>=8,<9
+ansible-lint
+docker
+flake8
+molecule
+molecule-plugins[vagrant]
+pytest-testinfra

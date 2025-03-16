@@ -47,3 +47,6 @@ basic_common_pakages:
   - netcat
   - iperf3
   - smartmontools
+  - auditd
+  - audispd-plugins
+  - mailx

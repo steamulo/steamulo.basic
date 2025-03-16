@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Configuration des adresses
+RECIPIENT="hebergement@steamulo.com"
+FROM="hebergement@steamulo.com"
+
+HOSTNAME="{{ ansible_hostname }}"
+DATE=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Recherche des événements de sécurité dans les 30 dernières minutes
+OUTPUT=$(ausearch --start recent -k ssh_key -k ssh_config -k system_users -k sudo_config -i 2>/dev/null)
+
+if [ -n "$OUTPUT" ]; then
+  # Calculer le nombre d'événements détectés (nombre de lignes)
+  EVENT_COUNT=$(echo "$OUTPUT" | wc -l)
+
+  # Construire un objet détaillé avec le hostname et le nombre d'événements
+  SUBJECT="[ALERTE] [$HOSTNAME] $EVENT_COUNT événement(s) critique(s) détecté(s) à $DATE"
+
+  # Construire le corps du mail
+  BODY="Bonjour,
+
+Une alerte de sécurité a été déclenchée sur le serveur $HOSTNAME le $DATE.
+Nombre d'événements critiques détectés : $EVENT_COUNT
+
+Détails des événements :
+$OUTPUT
+
+Merci de vérifier immédiatement l'état du système.
+
+Cordialement,
+L'équipe de sécurité"
+
+  # Envoi du mail
+  echo "$BODY" | mail -s "$SUBJECT" -r "$FROM" "$RECIPIENT"
+fi

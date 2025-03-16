@@ -1,0 +1,9 @@
+[Unit]
+Description=Exécute régulièrement l'audit de sécurité
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target

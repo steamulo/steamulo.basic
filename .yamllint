@@ -1,6 +1,8 @@
 ---
 
 rules:
+  document-start:
+    present: true
   braces:
     max-spaces-inside: 1
     level: error
@@ -40,4 +42,6 @@ rules:
 
 ignore: |
   .virtualenv
+  .git
   .cache
+  .github

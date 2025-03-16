@@ -9,3 +9,24 @@
   service:
     name: "{{ 'ssh' if ansible_facts['os_family'] == 'Debian' else 'sshd' }}"
     state: reloaded
+
+- name: Start auditd
+  service:
+    name: auditd
+    state: started
+    enabled: true
+
+- name: Restart auditd
+  service:
+    name: auditd
+    state: restarted
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: true
+
+- name: Start audit-monitor timer
+  systemd:
+    name: audit-monitor.timer
+    state: started
+    enabled: true
