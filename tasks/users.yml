@@ -56,6 +56,8 @@
       {{ item.user }} ALL=(ALL) NOPASSWD: {{ cmd }}
       {% endfor %}
     mode: '0440'
+    owner: root
+    group: root
     validate: 'visudo -cf %s'
   loop: "{{ basic_standard_users | selectattr('sudo_commands', 'defined') }}"
 
