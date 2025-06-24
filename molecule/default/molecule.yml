@@ -20,8 +20,15 @@ platforms:
     tmpfs:
       - /tmp
       - /run
+    command: "/lib/systemd/systemd"
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_REMOTE_TMP: /tmp/ansible
+    ANSIBLE_REMOTE_USER: root
+  config_options:
+    defaults:
+      remote_tmp: /tmp/ansible
 verifier:
   name: testinfra
   options:
