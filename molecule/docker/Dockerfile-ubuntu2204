@@ -25,8 +25,12 @@ RUN cp /bin/true /sbin/agetty
 RUN mkdir -p /etc/systemd/system/systemd-timesyncd.service.d/
 RUN bash -c 'echo -e "[Unit]\nConditionVirtualization=" > /etc/systemd/system/systemd-timesyncd.service.d/override.conf'
 
+# Créer un répertoire temporaire pour Ansible avec les permissions correctes
+RUN mkdir -p /tmp/ansible && \
+    chmod 777 /tmp/ansible
+
 STOPSIGNAL SIGRTMIN+3
 
 VOLUME [ "/sys/fs/cgroup" ]
 
-ENTRYPOINT ["/sbin/init"]
+CMD ["/lib/systemd/systemd"]

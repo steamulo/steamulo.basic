@@ -7,7 +7,7 @@ driver:
   name: docker
 lint: |
   set -e
-  ansible-lint
+  ansible-lint -v
   flake8
 platforms:
   - name: instance
@@ -17,11 +17,16 @@ platforms:
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /tmp
-      - /run
+    command: "/lib/systemd/systemd"
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_REMOTE_TMP: /tmp/ansible
+    ANSIBLE_REMOTE_USER: root
+  config_options:
+    defaults:
+      remote_tmp: /tmp/ansible
+      allow_world_readable_tmpfiles: true
 verifier:
   name: testinfra
   options:

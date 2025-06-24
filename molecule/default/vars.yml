@@ -1,0 +1,22 @@
+---
+# Variables spécifiques pour les tests Molecule
+basic_common_packages:
+  - logrotate
+  - anacron
+  - vim
+  - dbus
+  - htop
+  - unzip
+  - zip
+  - dnsutils
+  - iftop
+  - iotop
+  - dstat
+  - ncdu
+  - tree
+  - traceroute
+  - sysstat
+  - nload
+  - mtr
+  - mc
+
