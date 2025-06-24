@@ -47,7 +47,7 @@
   loop: "{{ basic_standard_users }}"
 
 - name: Create sudoers.d file for standard users with specific sudo commands
-  template:
+  ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ item.user }}"
     content: |
       # Sudoers entries for {{ item.user }}
@@ -83,19 +83,26 @@
     name: root
     password: "!"
 
-#- name: Set chattr -R -a on users' files and directories  TODO fix me
-#  command: "chattr -R -a /home/{{ item }}"
-#  loop: "{{ basic_to_remove_users }}"
-#  when:
-#    - basic_to_remove_users is defined
-#    - basic_to_remove_users | length > 0
-#    - ansible.builtin.stat(path="/home/{{ item }}").stat.exists
-#  vars:
-#    ansible_become: yes
+- name: Check if users' home directories exist
+  stat:
+    path: "/home/{{ item }}"
+  register: user_home_exists
+  loop: "{{ basic_to_remove_users | default([]) }}"
+  when:
+    - basic_to_remove_users is defined
+    - basic_to_remove_users | length > 0
+
+- name: Set chattr -R -a on users' files and directories
+  command: "chattr -R -a /home/{{ item.item }}"
+  loop: "{{ user_home_exists.results | default([]) }}"
+  when:
+    - item.stat is defined
+    - item.stat.exists | default(false)
+  become: yes
 
 - name: Remove old users
   user:
     name: "{{ item }}"
     state: absent
     remove: true
-  loop: "{{ basic_to_remove_users }}"
+  loop: "{{ basic_to_remove_users | default([]) }}"
