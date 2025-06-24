@@ -16,6 +16,9 @@ basic_sudo_users: []
 #     groups:
 #       - <group name>
 #     password: <password : mkpasswd --method=SHA-512>
+#     sudo_commands:       # Liste des commandes que l'utilisateur peut exécuter sans sudo su
+#       - "/bin/ls /var/log"
+#       - "/usr/bin/cat /etc/hosts"
 basic_standard_users: []
 
 # List of users to remove
