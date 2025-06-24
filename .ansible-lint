@@ -1,0 +1,12 @@
+# Configuration pour ansible-lint
+exclude_paths:
+  - .cache/
+  - .github/
+  - molecule/
+skip_list:
+  - yaml
+  - risky-shell-pipe
+  - experimental
+  - no-changed-when
+use_default_rules: true
+verbosity: 1
