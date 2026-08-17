@@ -16,6 +16,27 @@
     state: present
   notify: Restart ssh
 
+# KbdInteractiveAuthentication only exists since OpenSSH 8.7 (Ubuntu 22.04+);
+# older OS (Ubuntu <22.04, CentOS 7/8) need the legacy ChallengeResponseAuthentication name,
+# otherwise sshd fails to parse the config.
+# Only Ubuntu is checked here because the EL versions this role supports (see meta/main.yml:
+# 7 and 8) both ship OpenSSH < 8.7 and always fall into the else branch. Revisit this condition
+# if support for EL 9+ (OpenSSH >= 8.7) is ever added.
+- name: Set keyboard-interactive authentication option name based on OS support
+  set_fact:
+    ssh_kbd_interactive_option_name: >-
+      {{ 'KbdInteractiveAuthentication' if ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('22', '>=') else
+         'ChallengeResponseAuthentication' }}
+
+# Prevents PAM from bypassing PasswordAuthentication=no via keyboard-interactive prompts
+- name: Disallow keyboard-interactive authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^(# *)?(ChallengeResponseAuthentication|KbdInteractiveAuthentication)"
+    line: "{{ ssh_kbd_interactive_option_name }} no"
+    state: present
+  notify: Restart ssh
+
 - name: Allow agent forwarding
   lineinfile:
     dest: /etc/ssh/sshd_config
