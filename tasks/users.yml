@@ -16,6 +16,14 @@
     validate: visudo -cf %s
   when: basic_passwordless_sudo
 
+- name: Log commands run through sudo with a pty (CVE-2005-4890)
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults\s+use_pty'
+    line: 'Defaults        use_pty'
+    validate: visudo -cf %s
+
 - name: Creating users groups (1)
   group:
     name: "{{ item }}"
